@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Link Shortener</h2>
+        {% if is_valid %}
+        <form method="post" action="{% url 'main:linkview' token=token %}">   
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+                <p><strong>{% if item.comment %} {{item.comment}} {% endif %}</strong></p>
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        {% else %}
+            <div class="mb-3">
+                <p><strong>This link is not available any more.</strong></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

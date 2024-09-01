@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const yesRadio = document.getElementById('date-radio-true');
+        const noRadio = document.getElementById('date-radio-false');
+        const datePicker = document.getElementById('date-picker');
+
+        yesRadio.addEventListener('change', function() {
+            if (this.checked) {
+                datePicker.style.display = 'block';
+            }
+        });
+
+        noRadio.addEventListener('change', function() {
+            if (this.checked) {
+                datePicker.style.display = 'none';
+            }
+        });
+        var today = new Date();
+        today.setDate(today.getDate() + 1);
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0'); 
+        var year = today.getFullYear();
+        var todayDate = year + '-' + month + '-' + day;
+
+        document.getElementById('date').setAttribute('min', todayDate);
+    });
+
+</script>
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Link Shortener</h2>
+        <form method="post" action="{% url 'index:main' %}">   
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="link" class="form-label">Link</label>
+                <input class="form-control" id="link" name="link" placeholder="Enter your link" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password (Optional)</label>
+                <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+            </div>
+            <div class="mb-3">
+                <label for="comment" class="form-label">Comment (Optional)</label>
+                <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Add some comment"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="yes_no">Do you want to add a deadline to your link?</label>
+                <input type="radio" id="date-radio-true" name="date-radio" value="True"> Yes
+                <input type="radio" id="date-radio-false" name="date-radio" value="False" checked> No
+            </div>
+
+            <div id="date-picker" class="mb-3" style="display: none;">
+                <label for="date" class="form-label">Your link will be expired on this date.</label>
+                <input type="date" id="date" name="date" min="">
+            </div>
+
+            <div class="mb-3">
+                <label for="one_time">One time only?</label>
+                <input type="radio" id="one_time" name="one_time" value="True"> Yes
+                <input type="radio" id="one_time" name="one_time" value="False" checked> No
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

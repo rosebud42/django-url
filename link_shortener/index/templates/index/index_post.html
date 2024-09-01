@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    function copyText() {
+
+        /* Copy text into clipboard */
+        navigator.clipboard.writeText
+            ("localhost:8000"+"{% url 'main:linkview' token=token %}");
+        document.getElementById("message").classList.remove("hidden");
+    }
+    function goEdit(){
+        location.href = "{% url 'main:editlink' token=token %}";
+    }
+
+    </script>
+<style>
+    .hidden{
+        display: none;
+        left: 20px;
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Your link is created successfully!</h2>
+
+        <h3 class="text-center mb-5">Your link : </h3>
+        <h3 class="text-center mb-5"><a href="{% url 'main:linkview' token %}" id="token">{{token}}</a></h3>
+        <button type="button" onclick="copyText()" class="btn btn-primary">Copy to clipboard</button>
+        <span id="message" class="hidden">Link is copied.</span>
+        <button type="button" onclick="goEdit()" class="btn btn-secondary">Edit Link</button>
+    </div>
+</div>
+
+{% endblock %}

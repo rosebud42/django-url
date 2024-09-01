@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% csrf_token %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var today = new Date();
+        today.setDate(today.getDate() + 1);
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0'); 
+        var year = today.getFullYear();
+        var todayDate = year + '-' + month + '-' + day;
+
+        document.getElementById('date').setAttribute('min', todayDate);
+    });
+
+</script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column; /* Mesaj kutusu ve panellerin dikey olarak hizalanması */
+        }
+
+        .message-container {
+            width: 100%;
+            max-width: 900px; /* Panellerin toplam genişliğiyle aynı olmalı */
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .panel-container {
+            display: flex;
+            max-width: 900px; /* Tüm panel genişliği */
+            width: 100%;
+            gap: 40px; /* Paneller arası boşluk */
+        }
+
+        .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .card-header {
+            text-align: center;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .card-body {
+            flex: 1;
+            padding: 10px;
+        }   
+    </style>
+
+{% if messages %}
+    <div class="message-container">
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="alert alert-success w-100 text-center" role="alert">
+            {% else %}
+                <div class="alert alert-warning w-100 text-center" role="alert">
+            {% endif %}
+                    {{ message }}
+                </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+    <div class="panel-container">
+        <!-- Kullanıcı Bilgileri Kartı -->
+        <div class="card">
+            <div class="card-header">
+                Link Information
+            </div>
+            <div class="card-body">
+                {% if password %}
+                <p><strong>Link:</strong>Hidden</p>
+                {% else %}
+                <p><strong>Link:</strong> <a href="{{link}}">{{link}}</a></p>
+                {% endif %}
+                <p><strong>Shortened Link:</strong> <a href="{% url 'main:linkview' token=shortened_link %}">{{shortened_link}}</a></p>
+                <p><strong>Times used:</strong>{{times_used}}</p>
+                <br><br>
+                <form method="POST">{% csrf_token %}<button type="submit" name="action" class="btn btn-primary w-100" value="delete">Delete This Link</button></form>
+                
+            </div>
+        </div>
+
+        {% if password %}
+        <div class="card">
+            <div class="card-header">
+                Change Password
+            </div>
+            <div class="card-body">
+                <p>Leave the new password sections blank if you want to delete your password.</p>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="current-password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current-password" name="current-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new-password" name="new-password" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm-password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm-password" name="confirm-password" >
+                    </div>
+                    <button type="submit" name="action" class="btn btn-primary w-100" value="change_submit">Change Password</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-header">
+                Add Password
+            </div>
+            <div class="card-body">
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="add-password" name="add-password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm-password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="add-confirm-password" name="add-confirm-password" required>
+                    </div>
+                    <button type="submit" name="action" class="btn btn-primary w-100" value="add_submit">Add Password</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                Comment Section
+            </div>
+            <div class="card-body">
+
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="about" class="form-label">Update Comments</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4">{% if comment %}{{comment}}{% endif %}</textarea>
+                    </div>
+                    <button type="submit" name="action" value="comment_submit" class="btn btn-primary w-100">Update</button>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                Date Section
+            </div>
+            <div class="card-body">
+
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <p><strong>Current expire date:</strong>{{exp_date}}</p>
+                        <label for="about" class="form-label">Update your link's expire date</label>
+                        <input type="date" id="date" name="date" value="{% if exp_date %}{{ exp_date|date:'Y-m-d' }}{% endif %}" min="">
+
+                    </div>
+                    <button type="submit" name="action" value="update_date" class="btn btn-primary w-100">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
