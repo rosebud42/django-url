@@ -32,6 +32,6 @@ A Django-based web application that allows users to shorten and encrypt URLs. Us
 5. **Run the application:**
    - `python manage.py runserver`
 
-# Made by rosebud. Bugs are features..
+
 # contact : efekanaksoy35@gmail.com
 
